@@ -1,4 +1,5 @@
 //Jeff
+//Changes
 //Rev A: Implemented Loop for shift register and inputs
 //Rev B: Need to make inputs for buttons consistent 
 #include <math.h>
