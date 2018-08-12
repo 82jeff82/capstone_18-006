@@ -1,14 +1,12 @@
-//Jeff
-//Changes
 //Rev A: Implemented Loop for shift register and inputs
 //Rev B: Need to make inputs for buttons consistent 
 #include <math.h>
-//Pin connected to ST_CP of 74HC595
-int latchPin = 3;
-//Pin connected to SH_CP of 74HC595
-int clockPin = 2;
-////Pin connected to DS of 74HC595
-int dataPin = 5;
+//Pin connected to ST_CP (RCLK) pin 12 of 74HC595
+int latchPin = 10;
+//Pin connected to SH_CP (SRCLK) pin 11 of 74HC595
+int clockPin = 6;  
+////Pin connected to DS (SER) pin 14 of 74HC595
+int dataPin = 11;  //Working
 int power = 0;
 
 //Global Variables
@@ -54,19 +52,6 @@ void loop() {
       Serial.print("Printing Cycle ");
       Serial.print(cycle);
       Serial.print(":\n");
-      
-      /*Temporary Code to read the input of the thing
-        
-      
-        for (j = 0; j < 3 ; j++) {
-          Serial.print("Button ");
-          Serial.print(buttonNumber);
-          Serial.print(":");
-          Serial.print(outputArray[j][3]);
-          Serial.print("\n");
-          buttonNumber++;
-        }
-        */
       //Old code for printing out the status of the buttons
       for (i = 0; i < 4 ; i++) {
         for (j = 0; j < 3 ; j++) {
@@ -89,48 +74,19 @@ void loop() {
     digitalWrite(latchPin, LOW);
     // shift out the bits:
     shiftOut(dataPin, clockPin, LSBFIRST, powerOf(2, power));
-    /*
-    Serial.print("Power = ");
-    Serial.print(powerOf(2, power));
-    Serial.print("\n");
-    */
     //delay(20);
     //take the latch pin high so the LEDs will light up:
     digitalWrite(latchPin, HIGH);
     // pause before next value:
 
-    /*Temp code
-    Serial.print("I have reached the power =");
-    Serial.print(power);
-    Serial.print("point \n");
-    */
     if ((power == 1) || (power == 0) || (power == 2))
     {
-      //Temproary code, need to fix
-
-     
-     //temp=power;
-      
       outputArray[power][0] = digitalRead(inputA);
       outputArray[power][1] = digitalRead(inputB);
       outputArray[power][2] = digitalRead(inputC);
       outputArray[power][3] = digitalRead(inputD);
-      /*For debugging Purposes:
-      Serial.print("Button A = ");
-      Serial.print(outputArray[power][0]);
-      Serial.print("\n");
-      Serial.print("Button B = ");
-      Serial.print(outputArray[power][1]);
-      Serial.print("\n");
-      Serial.print("Button C = ");
-      Serial.print(outputArray[power][2]);
-      Serial.print("\n");
-      Serial.print("Button D = ");
-      Serial.print(outputArray[power][3]);
-      Serial.print("\n");
-      */
     }
-    delay(100);
+    delay(20);
     cycle++;
     power++;
   }
