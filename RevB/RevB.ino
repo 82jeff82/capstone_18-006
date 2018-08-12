@@ -7,7 +7,6 @@ int rclkPin = 10; //
 int srclkPin = 6;  //Working
 ////Pin connected to DS (SER) pin 14 of 74HC595
 int serPin = 11;  //Working
-int power = 0;
 
 //Global Variables
 //Pin connected to input A
@@ -18,6 +17,11 @@ int inputB = 1;
 int inputC = 2;
 //Pin connected to input D
 int inputD = 3;
+
+//Value to be shifted out
+uint8_t data = 1;
+
+uint8_t data_shifted = 8;
 
 int cycle = 0;
 
@@ -46,11 +50,9 @@ void loop() {
   // count from 0 to 255 and display the number
   // on the LEDs
   while (1) {
-    if (power > 7)
+    if (data_shifted >= 8)
     {
       buttonNumber=1;
-      Serial.print("Printing Cycle ");
-      Serial.print(cycle);
       Serial.print(":\n");
       //Old code for printing out the status of the buttons
       for (i = 0; i < 4 ; i++) {
@@ -63,46 +65,39 @@ void loop() {
           buttonNumber++;
         }
       }
-      
       Serial.print("\n");
-      power = 0;
+      Serial.print("Printing Cycle ");
+      Serial.print(cycle);
     }
 
-    
-    // take the rclkPin low so
-    // the LEDs don't change while you're sending in bits:
-    digitalWrite(rclkPin, LOW);
-    // shift out the bits:
-    shiftOut(serPin, srclkPin, LSBFIRST, 0b00000001);
-    //delay(20);
-    //take the latch pin high so the LEDs will light up:
-    digitalWrite(rclkPin, HIGH);
-    // pause before next value:
-
-    if ((power == 1) || (power == 0) || (power == 2))
+    if (data_shifted>=8) 
     {
-      outputArray[power][0] = digitalRead(inputA);
-      outputArray[power][1] = digitalRead(inputB);
-      outputArray[power][2] = digitalRead(inputC);
-      outputArray[power][3] = digitalRead(inputD);
+      digitalWrite(srclkPin, HIGH);
+      digitalWrite(rclkPin, LOW);
+      digitalWrite(serPin, HIGH);
+      data_shifted = 1;
+      delay(20);
     }
+    else
+    {
+      digitalWrite(srclkPin, HIGH);
+      digitalWrite(rclkPin, LOW);
+      digitalWrite(serPin, LOW);
+      data_shifted++;
+      delay(20);
+    }
+    
+    if ((data_shifted-1) <= 2) 
+    {
+      outputArray[data_shifted-1][0] = digitalRead(inputA);
+      outputArray[data_shifted-1][1] = digitalRead(inputB);
+      outputArray[data_shifted-1][2] = digitalRead(inputC);
+      outputArray[data_shifted-1][3] = digitalRead(inputD);
+    }
+    digitalWrite(srclkPin, LOW);
+    digitalWrite(rclkPin, HIGH);
     delay(20);
-    cycle++;
-    power++;
   }
 }
 
-int powerOf(int base, int power)
-{
-  int result = 1;
-  int i;
-  int invert=0b11111111;
-  for (i = 0; i < power; i++)
-  {
-    result = result * base;
 
-  }
-  
-  result=invert^result;
-  return result;
-}
