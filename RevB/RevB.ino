@@ -2,22 +2,22 @@
 //Rev B: Need to make inputs for buttons consistent 
 #include <math.h>
 //Pin connected to ST_CP (RCLK) pin 12 of 74HC595
-int latchPin = 10;
+int rclkPin = 10; //
 //Pin connected to SH_CP (SRCLK) pin 11 of 74HC595
-int clockPin = 6;  
+int srclkPin = 6;  //Working
 ////Pin connected to DS (SER) pin 14 of 74HC595
-int dataPin = 11;  //Working
+int serPin = 11;  //Working
 int power = 0;
 
 //Global Variables
 //Pin connected to input A
-int inputA = 11;
+int inputA = 0;
 //Pin connected to input B
-int inputB = 10;
+int inputB = 1;
 //Pin connected to input C
-int inputC = 9;
+int inputC = 2;
 //Pin connected to input D
-int inputD = 6;
+int inputD = 3;
 
 int cycle = 0;
 
@@ -29,9 +29,9 @@ bool outputArray[3][4];
 
 //Pin Setup
 void setup() {
-  pinMode(latchPin, OUTPUT);
-  pinMode(clockPin, OUTPUT);
-  pinMode(dataPin, OUTPUT);
+  pinMode(rclkPin, OUTPUT);
+  pinMode(srclkPin, OUTPUT);
+  pinMode(serPin, OUTPUT);
   pinMode(inputA, INPUT);
   pinMode(inputB, INPUT);
   pinMode(inputC, INPUT);
@@ -69,14 +69,14 @@ void loop() {
     }
 
     
-    // take the latchPin low so
+    // take the rclkPin low so
     // the LEDs don't change while you're sending in bits:
-    digitalWrite(latchPin, LOW);
+    digitalWrite(rclkPin, LOW);
     // shift out the bits:
-    shiftOut(dataPin, clockPin, LSBFIRST, powerOf(2, power));
+    shiftOut(serPin, srclkPin, LSBFIRST, 0b00000001);
     //delay(20);
     //take the latch pin high so the LEDs will light up:
-    digitalWrite(latchPin, HIGH);
+    digitalWrite(rclkPin, HIGH);
     // pause before next value:
 
     if ((power == 1) || (power == 0) || (power == 2))
